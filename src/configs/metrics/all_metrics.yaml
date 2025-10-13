@@ -1,0 +1,14 @@
+dino: 
+  _target_: src.metrics.dino.DinoMetric
+  model_name: dinov2_vits14
+  to_norm: True
+  
+clip_ts:
+    _target_: src.metrics.text_sim.TextSimMetric
+    model_name: ViT-L/14@336px
+
+id_sim_max:
+    _target_: src.metrics.id_sim_metric.IDSimMax
+
+id_sim_best:
+    _target_: src.metrics.id_sim_metric.IDSimBest

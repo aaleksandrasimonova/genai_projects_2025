@@ -1,0 +1,7 @@
+_target_: src.trainer.inferencer.LoraInferencer
+device: "cuda:0"
+epoch_len: 100
+seed: 0
+exp_save_dir: ???
+ckpt_dir: ???
+epochs_to_infer: ???

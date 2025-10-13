@@ -1,0 +1,14 @@
+train:
+    dreambooth:
+        _target_: src.datasets.dreambooth.DreamBoothTrainDataset
+        data_path: /path/to/folder/with/images
+        placeholder_token: sks
+        class_name: dog
+        instance_transforms: ${transforms.instance_transforms.train}
+
+val:
+    db_liv_small:
+      _target_: src.datasets.dreambooth.DreamBoothLivingSmall
+      data_path: /home/jovyan/bobkov/dreambooth/dataset/dog
+      placeholder_token: sks
+      class_name: dog

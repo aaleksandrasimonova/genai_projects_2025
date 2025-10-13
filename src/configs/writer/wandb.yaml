@@ -1,0 +1,7 @@
+_target_: src.logger.wandb.WandBWriter
+project_name: "persongen"
+entity: null
+run_name: "testing"
+mode: "online"
+loss_names: ["loss"] # which losses to log (useful for multi-loss tasks, s.a. GANs)
+id_length: 8 # length of the run_id
