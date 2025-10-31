@@ -152,6 +152,8 @@ class DiffusionLora(nn.Module):
         # prompt_embeds = torch.cat([hidden1, hidden2], dim=-1)
         # pooled_prompt_embeds = torch.cat([pooled1, pooled2], dim=-1)
 
+        prompt_embeds = hidden1
+        pooled_prompt_embeds = pooled2
 
         if do_cfg:
             tokens_unc = [""] * batch_size
