@@ -1,0 +1,6 @@
+_target_: src.logger.clearml.ClearMLWriter
+project_name: "persongen"
+task_name: "testing"
+tags: ["SDXL", "LoRA"]
+loss_names: ["loss"] # which losses to log (useful for multi-loss tasks, s.a. GANs)
+id_length: 8 # length of the run_id

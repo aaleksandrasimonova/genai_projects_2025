@@ -1,14 +1,14 @@
 train:
     dreambooth:
         _target_: src.datasets.dreambooth.DreamBoothTrainDataset
-        data_path: /path/to/folder/with/images
+        data_path: ./genai_projects_2025/dataset/train #/path/to/folder/with/images
         placeholder_token: sks
-        class_name: dog
+        class_name: dakota
         instance_transforms: ${transforms.instance_transforms.train}
 
 val:
     db_liv_small:
       _target_: src.datasets.dreambooth.DreamBoothLivingSmall
-      data_path: /home/jovyan/bobkov/dreambooth/dataset/dog
+      data_path: ./genai_projects_2025/dataset/val #/home/jovyan/bobkov/dreambooth/dataset/dog
       placeholder_token: sks
-      class_name: dog
+      class_name: dakota

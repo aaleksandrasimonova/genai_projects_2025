@@ -1,7 +1,7 @@
 defaults:
   - trainer: lora
   - model: sdxl_lora
-  - writer: console
+  - writer: clearml #console
   - transforms: only_instance
   - lr_scheduler: constant
   - pipeline: sdxl
