@@ -17,6 +17,7 @@ class ClearMLWriter:
         project_name,
         task_name=None,
         tags=None,
+        run_name=None,
         **kwargs,
     ):
         """
@@ -31,10 +32,13 @@ class ClearMLWriter:
         try:
             from clearml import Task
 
-            # Инициализируем задачу в ClearML
+            final_task_name = run_name or task_name or f"SDXL-LoRA-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            
+            self.run_name = final_task_name
+            
             self.task = Task.init(
                 project_name=project_name,
-                task_name=task_name or f"SDXL-LoRA-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+                task_name=final_task_name,
                 tags=tags,
                 reuse_last_task_id=True
             )
@@ -43,11 +47,13 @@ class ClearMLWriter:
             self.task.connect(project_config)
             
             self.logger = logger
-            self.logger.info(f"ClearML initialized: {self.task.get_task_id()}")
+            task_id = self.task.id
+            self.logger.info(f"ClearML initialized: {task_id}")
 
         except ImportError:
             logger.warning("For use ClearML install it via: \n\t pip install clearml")
             self.task = None
+            self.run_name = run_name or "unknown"
 
         self.step = 0
         # the mode is usually equal to the current partition name
