@@ -146,13 +146,13 @@ class DiffusionLora(nn.Module):
 
             out2 = self.text_encoder_2(text_enc2.input_ids.to(self.device),
                                        output_hidden_states=True)
-            # hidden2 = out2.hidden_states[-2]
+            hidden2 = out2.hidden_states[-2]
             pooled2 = out2.text_embeds #out2.last_hidden_state[:, -1, :] 
 
         # prompt_embeds = torch.cat([hidden1, hidden2], dim=-1)
         # pooled_prompt_embeds = torch.cat([pooled1, pooled2], dim=-1)
 
-        prompt_embeds = hidden1
+        prompt_embeds = torch.cat([hidden1, hidden2], dim=-1)
         pooled_prompt_embeds = pooled2
 
         if do_cfg:
@@ -177,16 +177,16 @@ class DiffusionLora(nn.Module):
 
                 out2_unc = self.text_encoder_2(text_enc2_unc.input_ids.to(self.device),
                                              output_hidden_states=True)
-                # hidden2_unc = out2_unc.hidden_states[-2]
+                hidden2_unc = out2_unc.hidden_states[-2]
                 pooled2_unc = out2_unc.text_embeds #out2_unc.last_hidden_state[:, -1, :]
 
-            # prompt_embeds_unc = torch.cat([hidden1_unc, hidden2_unc], dim=-1)
+            prompt_embeds_unc = torch.cat([hidden1_unc, hidden2_unc], dim=-1)
             # pooled_prompt_embeds_unc = torch.cat([pooled1_unc, pooled2_unc], dim=-1)
 
             # prompt_embeds = torch.cat([prompt_embeds_unc, prompt_embeds], dim=0)
             # pooled_prompt_embeds = torch.cat([pooled_prompt_embeds_unc, pooled_prompt_embeds], dim=0)
 
-            prompt_embeds = torch.cat([hidden1_unc, hidden1], dim=0)
+            prompt_embeds = torch.cat([prompt_embeds_unc, prompt_embeds], dim=0)
             pooled_prompt_embeds = torch.cat([pooled2_unc, pooled2], dim=0)
 
         return prompt_embeds, pooled_prompt_embeds

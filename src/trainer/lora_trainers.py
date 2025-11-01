@@ -1,4 +1,6 @@
 import torch
+from torch import nn
+import torch.nn.functional as F
 
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
@@ -35,12 +37,32 @@ class LoraTrainer(BaseTrainer):
         # batch.update(model_output)
         # losses = ...
         # batch.uodate(losses)
-        
 
-        # update metrics for each loss (in case of multiple losses)
-        for loss_name in self.config.writer.loss_names:
-            batch[loss_name] = batch[loss_name].mean()
-            train_metrics.update(loss_name, batch[loss_name].item())
+        pixel_values = batch["pixel_values"].to(self.device)
+        prompt = batch["prompt"]
+
+        model_output = self.model(pixel_values, prompt, do_cfg=False)
+
+        model_pred = model_output["model_pred"].float()
+        target = model_output["target"].float()
+
+        loss_dict = self.criterion(model_pred, target)
+        loss = loss_dict["loss"]
+
+        self.optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        self._clip_grad_norm()
+        self.optimizer.step()
+        if self.lr_scheduler is not None:
+            self.lr_scheduler.step()      
+
+        batch["loss"] = loss.detach()
+        train_metrics.update("loss", loss.item())
+
+        # # update metrics for each loss (in case of multiple losses)
+        # for loss_name in self.config.writer.loss_names:
+        #     batch[loss_name] = batch[loss_name].mean()
+        #     train_metrics.update(loss_name, batch[loss_name].item())
 
         return batch
 
@@ -51,6 +73,24 @@ class LoraTrainer(BaseTrainer):
         # 
         # generated_images = ...
         # batch['generated'] = generated_images
+
+        self.model.eval()
+
+        prompts = batch["prompt"]
+        generated_images = []
+ 
+        for prompt in prompts:
+            image = self.pipe(
+                prompt=prompt,
+                num_inference_steps=self.config.validation_args.num_inference_steps,
+                guidance_scale=self.config.validation_args.guidance_scale,
+                height=self.config.validation_args.height,
+                width=self.config.validation_args.width,
+                negative_prompt=self.config.validation_args.negative_prompt,
+            ).images[0]
+            generated_images.append(image)
+
+        batch["generated"] = generated_images
 
         for metric in self.metrics:
             metric_result = metric(**batch)
@@ -77,7 +117,7 @@ class LoraTrainer(BaseTrainer):
         # logging scheme might be different for different partitions
         if mode == "train":  # the method is called only every self.log_step steps
             # Log Stuff
-            pass
+            self.writer.add_scalar("train/loss", batch["loss"].item())
         else:
             # Log Stuff
             prompt = batch['prompt']
