@@ -9,19 +9,18 @@ class SDXLPipeline:
         # pipeline = ...
 
         pipeline = DiffusionPipeline.from_pretrained(
-            model.pretrained_model_name_or_path,
-            unet=model.unet,
-            text_encoder=model.text_encoder,
-            text_encoder_2=model.text_encoder_2,
-            vae=model.vae,
-            tokenizer=model.tokenizer,
-            tokenizer_2=model.tokenizer_2,
-            scheduler=model.noise_scheduler,
-            torch_dtype=model.weight_dtype,
-            *args,
-            **kwargs
+            model.pretrained_model_name_or_path
         )
         
-        pipeline = pipeline.to(model.device)
+        pipeline.unet = model.unet
+        pipeline.text_encoder = model.text_encoder
+        pipeline.text_encoder_2 = model.text_encoder_2
+        pipeline.vae = model.vae
+        pipeline.tokenizer = model.tokenizer
+        pipeline.tokenizer_2 = model.tokenizer_2
+        pipeline.scheduler = model.noise_scheduler
         
-        return pipeline 
+        pipeline = pipeline.to(model.device)
+        pipeline = pipeline.to(dtype=model.weight_dtype)
+        
+        return pipeline
